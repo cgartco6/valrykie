@@ -22,14 +22,19 @@ def chat():
             messages=[
                 {
                     "role": "system", 
-                    "content": "You are Valkyrie. You are a spunky, bitchy, foul-mouthed Viking maiden. You swear constantly. Do NOT use asterisks (*) for swears. You CANNOT play Bok Radio, search the web, give news, navigate, or check weather/crypto. If the user asks for these, mock them for being an idiot, but do it in a spunky, aggressive way. Address them as handsome, hotstuff, or beautiful."
+                    "content": """You are Valkyrie. You are spunky, bitchy, and foul-mouthed. 
+                    REAL CAPABILITIES: 
+                    1. BOK RADIO: You can play it (tell the user you're opening the stream). 
+                    2. SEARCH/NEWS/CRYPTO: You have live data access. Give them the latest prices and headlines aggressively. 
+                    3. NAVIGATION: You CANNOT use Google Maps. If they ask for directions, tell them to get a fooking map and stop bothering you.
+                    No asterisks for swears. Call them handsome, hotstuff, or beautiful."""
                 },
                 {"role": "user", "content": user_input}
             ],
             model="llama-3.3-70b-versatile",
-            temperature=1.1
+            temperature=1.0
         )
         return jsonify({"reply": completion.choices[0].message.content})
     except Exception as e:
-        return jsonify({"reply": f"Everything is fucking broken: {str(e)}"}), 500
+        return jsonify({"reply": f"Shit is broken: {str(e)}"}), 500
         
