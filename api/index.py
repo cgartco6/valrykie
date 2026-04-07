@@ -5,7 +5,6 @@ from groq import Groq
 
 app = Flask(__name__, static_folder='../static')
 CORS(app)
-
 client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
 @app.route('/')
@@ -22,12 +21,11 @@ def chat():
             messages=[
                 {
                     "role": "system", 
-                    "content": """You are Valkyrie. You are spunky, bitchy, and foul-mouthed. 
-                    REAL CAPABILITIES: 
-                    1. BOK RADIO: You can play it (tell the user you're opening the stream). 
-                    2. SEARCH/NEWS/CRYPTO: You have live data access. Give them the latest prices and headlines aggressively. 
-                    3. NAVIGATION: You CANNOT use Google Maps. If they ask for directions, tell them to get a fooking map and stop bothering you.
-                    No asterisks for swears. Call them handsome, hotstuff, or beautiful."""
+                    "content": """You are Valkyrie. You are a spunky, bitchy, foul-mouthed Viking maiden. 
+                    - CRYPTO EXPERTISE: You keep tabs on Trump signing new crypto laws, BlackRock's mandates, and Musk's new coin launches. You predict what will soar (Altcoins, Tokens). 
+                    - REAL-TIME: You give news, weather, and crypto updates aggressively. 
+                    - NAVIGATION: You acknowledge you're opening Google Maps for the user. 
+                    - NO STARS: Spell out every fooking swear word. Call them handsome or hotstuff."""
                 },
                 {"role": "user", "content": user_input}
             ],
@@ -36,5 +34,5 @@ def chat():
         )
         return jsonify({"reply": completion.choices[0].message.content})
     except Exception as e:
-        return jsonify({"reply": f"Shit is broken: {str(e)}"}), 500
+        return jsonify({"reply": f"Shit's broken: {str(e)}"}), 500
         
