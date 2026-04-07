@@ -3,46 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VALKYRIE</title>
+    <title>VALKYRIE INTERFACE</title>
     <style>
-        body { background: url('/static/background.jpg') no-repeat center center fixed; background-size: cover; color: white; font-family: sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        #chat { width: 400px; height: 500px; background: rgba(0,0,0,0.8); border: 2px solid red; display: flex; flex-direction: column; }
-        #msgs { flex-grow: 1; overflow-y: auto; padding: 10px; }
-        input { width: 100%; padding: 15px; background: #111; color: white; border: none; border-top: 2px solid red; outline: none; box-sizing: border-box; }
-        .valk { color: red; margin-bottom: 10px; }
-        .user { color: cyan; text-align: right; margin-bottom: 10px; }
+        body { background: #000; color: #fff; font-family: 'Courier New', monospace; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        #container { width: 100%; max-width: 500px; height: 90vh; border: 1px solid #600; display: flex; flex-direction: column; background: #050505; }
+        #header { background: #600; padding: 15px; text-align: center; font-weight: bold; letter-spacing: 3px; }
+        #chat { flex-grow: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        .valk { color: #ff4444; border: 1px solid #ff4444; padding: 10px; background: rgba(255,0,0,0.1); width: fit-content; }
+        .user { color: #44ff44; border: 1px solid #44ff44; padding: 10px; align-self: flex-end; width: fit-content; }
+        #input-box { border-top: 1px solid #fff; padding: 15px; }
+        input { width: 100%; background: none; border: none; color: #fff; outline: none; font-size: 1.1rem; text-transform: uppercase; }
     </style>
 </head>
 <body>
-    <audio id="snd" src="/static/sound.mp3"></audio>
-    <div id="chat">
-        <div id="msgs"><div class="valk">What the fuck do you want, handsome?</div></div>
-        <input type="text" id="in" placeholder="Type here..." autocomplete="off">
+    <div id="container">
+        <div id="header">VALKYRIE INTERFACE</div>
+        <div id="chat">
+            <div class="valk">WHAT THE FUCK DO YOU WANT NOW, HANDSOME?</div>
+        </div>
+        <div id="input-box">
+            <input type="text" id="in" placeholder="COMMAND ME..." autocomplete="off">
+        </div>
     </div>
+
     <script>
         const input = document.getElementById('in');
-        const msgs = document.getElementById('msgs');
-        const snd = document.getElementById('snd');
+        const chat = document.getElementById('chat');
+
+        // This function makes the laptop/android speakers talk
+        function speak(text) {
+            const speech = new SpeechSynthesisUtterance(text);
+            speech.lang = 'en-US';
+            speech.pitch = 0.8; // Lower pitch for a moodier vibe
+            speech.rate = 0.9;
+            window.speechSynthesis.speak(speech);
+        }
 
         input.addEventListener('keypress', async (e) => {
             if (e.key === 'Enter' && input.value.trim() !== "") {
-                const val = input.value;
+                const msg = input.value;
                 input.value = "";
-                msgs.innerHTML += `<div class="user">${val}</div>`;
-                
+                chat.innerHTML += `<div class="user">${msg}</div>`;
+                chat.scrollTop = chat.scrollHeight;
+
                 try {
                     const res = await fetch('/api/chat', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ message: val })
+                        body: JSON.stringify({ message: msg })
                     });
                     const data = await res.json();
-                    msgs.innerHTML += `<div class="valk">${data.reply}</div>`;
-                    snd.play().catch(() => {});
+                    chat.innerHTML += `<div class="valk">${data.reply}</div>`;
+                    chat.scrollTop = chat.scrollHeight;
+                    
+                    // Trigger the voice
+                    speak(data.reply);
+
                 } catch (err) {
-                    msgs.innerHTML += `<div class="valk">API is fucked. Check Vercel logs.</div>`;
+                    chat.innerHTML += `<div class="valk">SERVER IS FUCKED, HOTSTUFF.</div>`;
                 }
-                msgs.scrollTop = msgs.scrollHeight;
             }
         });
     </script>
