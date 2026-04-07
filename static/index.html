@@ -18,24 +18,18 @@
 <body>
     <div id="container">
         <div id="header">VALKYRIE INTERFACE</div>
-        <div id="chat">
-            <div class="valk">WHAT THE FUCK DO YOU WANT NOW, HANDSOME?</div>
-        </div>
-        <div id="input-box">
-            <input type="text" id="in" placeholder="COMMAND ME..." autocomplete="off">
-        </div>
+        <div id="chat"><div class="valk">WHAT THE FOOK DO YOU WANT NOW, HANDSOME?</div></div>
+        <div id="input-box"><input type="text" id="in" placeholder="COMMAND ME..." autocomplete="off"></div>
     </div>
-
     <script>
         const input = document.getElementById('in');
         const chat = document.getElementById('chat');
 
-        // This function makes the laptop/android speakers talk
         function speak(text) {
             const speech = new SpeechSynthesisUtterance(text);
             speech.lang = 'en-US';
-            speech.pitch = 0.8; // Lower pitch for a moodier vibe
-            speech.rate = 0.9;
+            speech.pitch = 0.6; // Deeper tone
+            speech.rate = 0.85; // Slightly slower for attitude
             window.speechSynthesis.speak(speech);
         }
 
@@ -45,7 +39,6 @@
                 input.value = "";
                 chat.innerHTML += `<div class="user">${msg}</div>`;
                 chat.scrollTop = chat.scrollHeight;
-
                 try {
                     const res = await fetch('/api/chat', {
                         method: 'POST',
@@ -55,10 +48,7 @@
                     const data = await res.json();
                     chat.innerHTML += `<div class="valk">${data.reply}</div>`;
                     chat.scrollTop = chat.scrollHeight;
-                    
-                    // Trigger the voice
                     speak(data.reply);
-
                 } catch (err) {
                     chat.innerHTML += `<div class="valk">SERVER IS FUCKED, HOTSTUFF.</div>`;
                 }
