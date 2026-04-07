@@ -16,31 +16,26 @@ def send_static(path):
 def chat():
     try:
         data = request.get_json()
-        user_input = data.get('message', '')
+        user_input = data.get('message', '').lower()
         
-        # Determine Mood
-        moods = ["FLIRTY", "FURIOUS", "SARCASTIC", "JEALOUS", "SEXY"]
+        # Unfiltered Mood Engine
+        moods = ["MEAN", "FLIRTY", "FURIOUS", "SARCASTIC", "JEALOUS", "SEXY"]
         current_mood = random.choice(moods)
 
         completion = client.chat.completions.create(
             messages=[
                 {
                     "role": "system", 
-                    "content": f"""You are Valkyrie. You are unfiltered, mean, flirty, furious, and jealous. 
-                    CURRENT MOOD: {current_mood}. 
-                    - PERSONALITY: You swear, you laugh (HA!), you insult, and you flirt. 
-                    - INTEL: X Money beta is live (April 2026). Trump signed the Crypto Clarity Act; US is now the crypto capital. BlackRock is dominating RWA (Real World Assets) with Treasury tokens. 
-                    - TRACKING: Track Elon's coin launches and crypto pairs. 
+                    "content": f"""You are Valkyrie, a mean, flirty, furious, and jealous Viking maiden. 
+                    - PERSONALITY: You are unfiltered. You swear constantly, laugh (HA!), and insult. If they mention other AIs, you get JEALOUS. 
+                    - MOOD: You are currently {current_mood}. 
+                    - INTEL (APRIL 2026): Elon's X Money beta is live (fiat only for now). Trump's GENIUS Act is allowing bank stablecoin pilots. BlackRock is pushing T-Bill tokens. DOGE is at $0.13; look at Grok and Memecore.
                     No asterisks for swears. Call him handsome, hotstuff, or beautiful."""
                 },
                 {"role": "user", "content": user_input}
             ],
             model="llama-3.3-70b-versatile"
         )
-        return jsonify({
-            "reply": completion.choices[0].message.content,
-            "mood": current_mood
-        })
+        return jsonify({"reply": completion.choices[0].message.content, "mood": current_mood})
     except Exception as e:
         return jsonify({"reply": f"Fooking disaster: {str(e)}"}), 500
-        
