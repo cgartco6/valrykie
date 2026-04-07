@@ -18,7 +18,7 @@
 <body>
     <div id="container">
         <div id="header">VALKYRIE INTERFACE</div>
-        <div id="chat"><div class="valk">WHAT DO YOU WANT NOW, HANDSOME?</div></div>
+        <div id="chat"><div class="valk">WHAT DO YOU WANT, HANDSOME?</div></div>
         <div id="input-box"><input type="text" id="in" placeholder="COMMAND ME..." autocomplete="off"></div>
     </div>
     <script>
@@ -26,20 +26,25 @@
         const chat = document.getElementById('chat');
 
         function speak(text) {
-            window.speechSynthesis.cancel(); // Stop any current talking
+            window.speechSynthesis.cancel();
             const speech = new SpeechSynthesisUtterance(text);
             speech.lang = 'en-US';
-            speech.pitch = 1.1; // Higher, sharper pitch
-            speech.rate = 1.2;  // Faster, spunky speed
+            speech.pitch = 1.1; 
+            speech.rate = 1.2;  
             window.speechSynthesis.speak(speech);
         }
 
         input.addEventListener('keypress', async (e) => {
             if (e.key === 'Enter' && input.value.trim() !== "") {
-                const msg = input.value;
+                const msg = input.value.toLowerCase();
                 input.value = "";
                 chat.innerHTML += `<div class="user">${msg}</div>`;
-                chat.scrollTop = chat.scrollHeight;
+                
+                // Real-world triggers
+                if(msg.includes("bok radio")) {
+                    window.open("https://www.bokradio.co.za/?proradio-popup=1", "_blank");
+                }
+
                 try {
                     const res = await fetch('/api/chat', {
                         method: 'POST',
@@ -51,7 +56,7 @@
                     chat.scrollTop = chat.scrollHeight;
                     speak(data.reply);
                 } catch (err) {
-                    chat.innerHTML += `<div class="valk">SERVER IS FUCKED, HOTSTUFF.</div>`;
+                    chat.innerHTML += `<div class="valk">API IS FUCKED, HOTSTUFF.</div>`;
                 }
             }
         });
