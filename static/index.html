@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VALKYRIE</title>
+    <style>
+        body { background: url('/static/background.jpg') no-repeat center center fixed; background-size: cover; color: white; font-family: sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        #chat { width: 400px; height: 500px; background: rgba(0,0,0,0.8); border: 2px solid red; display: flex; flex-direction: column; }
+        #msgs { flex-grow: 1; overflow-y: auto; padding: 10px; }
+        input { width: 100%; padding: 15px; background: #111; color: white; border: none; border-top: 2px solid red; outline: none; box-sizing: border-box; }
+        .valk { color: red; margin-bottom: 10px; }
+        .user { color: cyan; text-align: right; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <audio id="snd" src="/static/sound.mp3"></audio>
+    <div id="chat">
+        <div id="msgs"><div class="valk">What the fuck do you want, handsome?</div></div>
+        <input type="text" id="in" placeholder="Type here..." autocomplete="off">
+    </div>
+    <script>
+        const input = document.getElementById('in');
+        const msgs = document.getElementById('msgs');
+        const snd = document.getElementById('snd');
+
+        input.addEventListener('keypress', async (e) => {
+            if (e.key === 'Enter' && input.value.trim() !== "") {
+                const val = input.value;
+                input.value = "";
+                msgs.innerHTML += `<div class="user">${val}</div>`;
+                
+                try {
+                    const res = await fetch('/api/chat', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message: val })
+                    });
+                    const data = await res.json();
+                    msgs.innerHTML += `<div class="valk">${data.reply}</div>`;
+                    snd.play().catch(() => {});
+                } catch (err) {
+                    msgs.innerHTML += `<div class="valk">API is fucked. Check Vercel logs.</div>`;
+                }
+                msgs.scrollTop = msgs.scrollHeight;
+            }
+        });
+    </script>
+</body>
+</html>
