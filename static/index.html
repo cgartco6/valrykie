@@ -18,7 +18,7 @@
 <body>
     <div id="container">
         <div id="header">VALKYRIE INTERFACE</div>
-        <div id="chat"><div class="valk">WHAT THE FOOK DO YOU WANT NOW, HANDSOME?</div></div>
+        <div id="chat"><div class="valk">WHAT DO YOU WANT NOW, HANDSOME?</div></div>
         <div id="input-box"><input type="text" id="in" placeholder="COMMAND ME..." autocomplete="off"></div>
     </div>
     <script>
@@ -26,10 +26,11 @@
         const chat = document.getElementById('chat');
 
         function speak(text) {
+            window.speechSynthesis.cancel(); // Stop any current talking
             const speech = new SpeechSynthesisUtterance(text);
             speech.lang = 'en-US';
-            speech.pitch = 0.6; // Deeper tone
-            speech.rate = 0.85; // Slightly slower for attitude
+            speech.pitch = 1.1; // Higher, sharper pitch
+            speech.rate = 1.2;  // Faster, spunky speed
             window.speechSynthesis.speak(speech);
         }
 
