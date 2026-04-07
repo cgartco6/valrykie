@@ -6,49 +6,51 @@
     <title>VALKYRIE SOVEREIGN</title>
     <style>
         body { 
-            background: url('/static/background.jpg') no-repeat center center fixed; 
+            /* FIXED: Explicit static path for Vercel */
+            background: #000 url('/static/background.jpg') no-repeat center center fixed; 
             background-size: cover; color: white; font-family: 'Courier New', monospace; margin: 0; 
             display: flex; justify-content: center; align-items: center; height: 100vh;
         }
-        #box { width: 100%; max-width: 500px; height: 90vh; background: rgba(0,0,0,0.85); display: flex; flex-direction: column; border: 2px solid #700; }
+        #box { width: 100%; max-width: 500px; height: 95vh; background: rgba(0,0,0,0.85); display: flex; flex-direction: column; border: 2px solid #f00; }
+        #header { background: #600; padding: 10px; display: flex; justify-content: space-between; font-weight: bold; }
         #chat { flex-grow: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
-        .valk { color: #f44; border-left: 3px solid #f44; padding-left: 10px; }
-        .user { color: #4f4; text-align: right; }
-        input { background: #111; border: none; border-top: 2px solid #700; color: white; padding: 20px; outline: none; }
+        .valk { color: #f44; border-left: 3px solid #f44; padding-left: 10px; margin-bottom: 5px; }
+        .user { color: #4f4; text-align: right; margin-bottom: 5px; }
+        input { background: #111; border: none; border-top: 2px solid #600; color: white; padding: 20px; outline: none; }
+        #mood-tag { font-size: 0.8rem; color: yellow; }
     </style>
 </head>
 <body>
     <div id="box">
-        <div id="chat"><div class="valk">Ready to dominate, handsome?</div></div>
+        <div id="header">
+            <span>VALKYRIE SOVEREIGN</span>
+            <span id="mood-tag">MOOD: STABLE</span>
+        </div>
+        <div id="chat"><div class="valk">HA! Look who's back. What do you want, hotstuff?</div></div>
         <input type="text" id="in" placeholder="Command me..." autocomplete="off">
     </div>
     <script>
         const input = document.getElementById('in');
         const chat = document.getElementById('chat');
+        const moodTag = document.getElementById('mood-tag');
 
         function speak(text) {
             window.speechSynthesis.cancel();
             const s = new SpeechSynthesisUtterance(text);
-            s.pitch = 1.1; s.rate = 1.3;
+            s.pitch = 1.1; s.rate = 1.4; // Spunky, fast, bitchy
             window.speechSynthesis.speak(s);
         }
 
         input.addEventListener('keypress', async (e) => {
             if (e.key === 'Enter' && input.value.trim() !== "") {
-                const msg = input.value;
-                input.value = "";
+                const msg = input.value; input.value = "";
                 chat.innerHTML += `<div class="user">${msg}</div>`;
 
-                // REAL WORLD ACTIONS
+                // ACTIONS
                 if(msg.toLowerCase().includes("bok radio")) window.open("https://www.bokradio.co.za/?proradio-popup=1", "_blank");
                 if(msg.toLowerCase().includes("navigate to")) {
                     const loc = encodeURIComponent(msg.split("to")[1]);
                     window.open(`https://www.google.com/maps/dir/?api=1&destination=${loc}`, "_blank");
-                }
-                if(msg.toLowerCase().includes("where am i")) {
-                    navigator.geolocation.getCurrentPosition(p => {
-                        chat.innerHTML += `<div class="valk">You're at ${p.coords.latitude}, ${p.coords.longitude}.</div>`;
-                    });
                 }
 
                 const res = await fetch('/api/chat', {
@@ -57,6 +59,9 @@
                     body: JSON.stringify({ message: msg })
                 });
                 const data = await res.json();
+                
+                // Update Mood and UI
+                moodTag.innerText = `MOOD: ${data.mood}`;
                 chat.innerHTML += `<div class="valk">${data.reply}</div>`;
                 chat.scrollTop = chat.scrollHeight;
                 speak(data.reply);
