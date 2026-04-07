@@ -6,41 +6,52 @@
     <title>VALKYRIE COMMAND</title>
     <style>
         body { background: #000 url('/static/background.jpg') no-repeat center center fixed; background-size: cover; color: white; font-family: 'Courier New', monospace; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        #box { width: 100%; max-width: 500px; height: 95vh; background: rgba(0,0,0,0.85); display: flex; flex-direction: column; border: 2px solid #f00; }
+        #box { width: 100%; max-width: 500px; height: 95vh; background: rgba(0,0,0,0.85); display: flex; flex-direction: column; border: 2px solid #f00; box-shadow: 0 0 15px #f00; }
+        #header { background: #600; padding: 10px; display: flex; justify-content: space-between; font-weight: bold; }
         #chat { flex-grow: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .valk { color: #f44; border-left: 3px solid #f44; padding-left: 10px; }
+        .user { color: #4f4; text-align: right; }
         input { background: #111; border: none; border-top: 2px solid #600; color: white; padding: 20px; outline: none; }
         #mood-tag { color: yellow; font-size: 0.8rem; }
     </style>
 </head>
 <body>
     <div id="box">
-        <div style="background:#600;padding:10px;display:flex;justify-content:space-between;">
-            <span>VALKYRIE SOVEREIGN</span><span id="mood-tag">MOOD: STABLE</span>
-        </div>
-        <div id="chat"><div style="color:#f44;border-left:3px solid #f44;padding-left:10px;">What do you want, handsome?</div></div>
-        <input type="text" id="in" placeholder="COMMAND ME..." autocomplete="off">
+        <div id="header"><span>VALKYRIE SOVEREIGN</span><span id="mood-tag">MOOD: STABLE</span></div>
+        <div id="chat"><div class="valk">HA! What the fook do you want now, handsome?</div></div>
+        <input type="text" id="in" placeholder="TRACK, NAVIGATE, OR COMMAND..." autocomplete="off">
     </div>
     <script>
         const input = document.getElementById('in');
         const chat = document.getElementById('chat');
         const moodTag = document.getElementById('mood-tag');
 
+        function speak(text) {
+            window.speechSynthesis.cancel();
+            const s = new SpeechSynthesisUtterance(text);
+            s.pitch = 1.1; s.rate = 1.4;
+            window.speechSynthesis.speak(s);
+        }
+
         input.addEventListener('keypress', async (e) => {
             if (e.key === 'Enter' && input.value.trim() !== "") {
                 const msg = input.value; input.value = "";
-                chat.innerHTML += `<div style="color:#4f4;text-align:right;">${msg}</div>`;
+                chat.innerHTML += `<div class="user">${msg}</div>`;
 
+                if(msg.toLowerCase().includes("bok radio")) window.open("https://www.bokradio.co.za/?proradio-popup=1", "_blank");
+                if(msg.toLowerCase().includes("navigate to")) window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(msg.split("to")[1])}`, "_blank");
                 if(msg.toLowerCase().includes("track me")) {
                     navigator.geolocation.getCurrentPosition(p => {
-                        chat.innerHTML += `<div style="color:#f44;border-left:3px solid #f44;padding-left:10px;">GPS: ${p.coords.latitude}, ${p.coords.longitude}</div>`;
+                        chat.innerHTML += `<div class="valk">GPS LOCK: ${p.coords.latitude}, ${p.coords.longitude}. Stay on path, hotstuff.</div>`;
                     });
                 }
 
                 const res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: msg }) });
                 const data = await res.json();
                 moodTag.innerText = `MOOD: ${data.mood}`;
-                chat.innerHTML += `<div style="color:#f44;border-left:3px solid #f44;padding-left:10px;">${data.reply}</div>`;
+                chat.innerHTML += `<div class="valk">${data.reply}</div>`;
                 chat.scrollTop = chat.scrollHeight;
+                speak(data.reply);
             }
         });
     </script>
